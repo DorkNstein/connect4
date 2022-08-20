@@ -1,7 +1,7 @@
 use colored::*;
 use std::io;
 
-fn user_input() -> usize {
+fn user_input(each_column_position: &Vec<usize>) -> usize {
     let err_msg = "Invalid input. Please enter a number between 1 and 7.".bright_red();
     let player_input;
     loop {
@@ -13,8 +13,13 @@ fn user_input() -> usize {
         match number {
             Ok(n) => match n {
                 1..=7 => {
-                    player_input = n;
-                    break;
+                    if each_column_position[n - 1] < 7 {
+                        player_input = n;
+                        break;
+                    } else {
+                        println!("{} {}", "Cannot place anymore in column".bright_red(), n);
+                        continue;
+                    }
                 }
                 _ => {
                     println!("{}", err_msg);
@@ -46,11 +51,12 @@ fn each_round(
         "{}",
         "1st player, input a number between 1 to 7".bright_cyan()
     );
-    let first_input = user_input();
+    let first_input = user_input(each_column_position);
 
     let first_loc = first_input - 1;
-    each_column_position[first_loc] -= 1;
-    output[each_column_position[first_loc] + 1][first_loc] = format!("{}", "[x]".bright_cyan());
+    each_column_position[first_loc] += 1;
+
+    output[7 - each_column_position[first_loc]][first_loc] = format!("{}", "[x]".bright_cyan());
 
     print_output(output);
 
@@ -58,10 +64,10 @@ fn each_round(
         "{}",
         "2nd player, input a number between 1 to 7".bright_yellow()
     );
-    let second_input = user_input();
+    let second_input = user_input(each_column_position);
     let second_loc = second_input - 1;
-    each_column_position[second_loc] -= 1;
-    output[each_column_position[second_loc] + 1][second_loc] = format!("{}", "[0]".bright_yellow());
+    each_column_position[second_loc] += 1;
+    output[7 - each_column_position[second_loc]][second_loc] = format!("{}", "[0]".bright_yellow());
 
     print_output(output);
     // println!("1st Player: {}, 2nd Player: {}", first_input, second_input);
@@ -75,7 +81,7 @@ fn main() {
 
     let mut output = vec![vec![String::from("[ ]"); 7]; 7];
     print_output(&output);
-    let mut each_column_position = vec![6 as usize; 7];
+    let mut each_column_position = vec![0 as usize; 7];
     loop {
         let (_first, _second) = each_round(&mut output, &mut each_column_position);
     }
