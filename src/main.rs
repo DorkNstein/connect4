@@ -1,8 +1,14 @@
 use colored::*;
 use std::io;
 
+const PLAY_SIZE: usize = 7;
+
 fn user_input(each_column_position: &Vec<usize>) -> usize {
-    let err_msg = "Invalid input. Please enter a number between 1 and 7.".bright_red();
+    let err_msg = format!(
+        "{} {}",
+        "Invalid input. Please enter a number between 1 and".bright_red(),
+        PLAY_SIZE.to_string().bright_red()
+    );
     let player_input;
     loop {
         let mut input = String::new();
@@ -12,12 +18,16 @@ fn user_input(each_column_position: &Vec<usize>) -> usize {
         let number = input.trim().parse::<usize>();
         match number {
             Ok(n) => match n {
-                1..=7 => {
-                    if each_column_position[n - 1] < 7 {
+                1..=PLAY_SIZE => {
+                    if each_column_position[n - 1] < PLAY_SIZE {
                         player_input = n;
                         break;
                     } else {
-                        println!("{} {}", "Cannot place anymore in column".bright_red(), n);
+                        println!(
+                            "{} {}",
+                            "Cannot place anymore in column".bright_red(),
+                            n.to_string().bright_red()
+                        );
                         continue;
                     }
                 }
@@ -43,35 +53,40 @@ fn print_output(output: &Vec<Vec<String>>) {
     println!("{}", "\n");
 }
 
-fn each_round(
+fn player_round(
     output: &mut Vec<Vec<String>>,
     each_column_position: &mut Vec<usize>,
-) -> (usize, usize) {
-    println!(
-        "{}",
-        "1st player, input a number between 1 to 7".bright_cyan()
-    );
-    let first_input = user_input(each_column_position);
+    player: u8, // 1 or 2
+) -> usize {
+    let player_string = match player {
+        1 => format!(
+            "{}{} {}",
+            player.to_string().bright_cyan(),
+            "st player, input a number between 1 to".bright_cyan(),
+            PLAY_SIZE.to_string().bright_cyan()
+        ),
+        2 => format!(
+            "{}{} {}",
+            player.to_string().bright_yellow(),
+            "st player, input a number between 1 to".bright_yellow(),
+            PLAY_SIZE.to_string().bright_yellow()
+        ),
+        _ => format!("{}", "Wrong player number".red()),
+    };
+    println!("{}", player_string);
+    let input = user_input(each_column_position);
 
-    let first_loc = first_input - 1;
-    each_column_position[first_loc] += 1;
+    let position = input - 1;
+    each_column_position[position] += 1;
 
-    output[7 - each_column_position[first_loc]][first_loc] = format!("{}", "[x]".bright_cyan());
-
+    let input_str = match player {
+        1 => format!("{}", "[x]".bright_cyan()),
+        2 => format!("{}", "[0]".bright_yellow()),
+        _ => String::from(""),
+    };
+    output[PLAY_SIZE - each_column_position[position]][position] = input_str;
     print_output(output);
-
-    println!(
-        "{}",
-        "2nd player, input a number between 1 to 7".bright_yellow()
-    );
-    let second_input = user_input(each_column_position);
-    let second_loc = second_input - 1;
-    each_column_position[second_loc] += 1;
-    output[7 - each_column_position[second_loc]][second_loc] = format!("{}", "[0]".bright_yellow());
-
-    print_output(output);
-    // println!("1st Player: {}, 2nd Player: {}", first_input, second_input);
-    (first_input, second_input)
+    input
 }
 
 fn main() {
@@ -79,10 +94,11 @@ fn main() {
     println!("{}", "Need 2 players to play the game".bright_purple());
     println!("{}", "Let's start!\n".bright_green());
 
-    let mut output = vec![vec![String::from("[ ]"); 7]; 7];
+    let mut output = vec![vec![String::from("( )"); PLAY_SIZE]; PLAY_SIZE];
     print_output(&output);
-    let mut each_column_position = vec![0 as usize; 7];
+    let mut each_column_position = vec![0 as usize; PLAY_SIZE];
     loop {
-        let (_first, _second) = each_round(&mut output, &mut each_column_position);
+        player_round(&mut output, &mut each_column_position, 1);
+        player_round(&mut output, &mut each_column_position, 2);
     }
 }
