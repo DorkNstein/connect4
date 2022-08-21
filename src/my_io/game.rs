@@ -132,12 +132,78 @@ impl Game {
         has_won
     }
 
-    fn diagonal_check(&self) -> bool {
-        false
+    fn bottom_left_to_top_right_diagonal_check(&self) -> bool {
+        let mut has_won = false;
+        let player_letter = get_player_letters(self.player);
+        let winning_count = (self.play_size + 1) / 2;
+        'outer: for (y_index, row) in self.output.iter().enumerate() {
+            if y_index < winning_count - 1 {
+                break 'outer;
+            }
+            for (x_index, cell) in row.iter().enumerate() {
+                let mut match_count = 0;
+                // Check next 4 diagonal cells up from bottom left to top right starting from current cell
+                if cell.to_owned() == player_letter {
+                    match_count += 1;
+                    'inner: for each in 1..4 {
+                        if self.output[y_index - each][x_index + each] == player_letter {
+                            match_count += 1;
+                        } else {
+                            match_count = 0;
+                            break 'inner;
+                        }
+                    }
+                }
+
+                if match_count >= winning_count {
+                    has_won = true;
+                    break 'outer;
+                }
+            }
+        }
+
+        has_won
+    }
+
+    fn top_left_to_bottom_right_diagonal_check(&self) -> bool {
+        let mut has_won = false;
+        let player_letter = get_player_letters(self.player);
+        let winning_count = (self.play_size + 1) / 2;
+
+        'outer: for (y_index, row) in self.output.iter().enumerate() {
+            if y_index > winning_count - 1 {
+                continue 'outer;
+            }
+            for (x_index, cell) in row.iter().enumerate() {
+                let mut match_count = 0;
+                // Check next 4 diagonal cells down from top left to bottom right starting from current cell
+                if cell.to_owned() == player_letter {
+                    match_count += 1;
+                    'inner: for each in 1..4 {
+                        if self.output[y_index + each][x_index + each] == player_letter {
+                            match_count += 1;
+                        } else {
+                            match_count = 0;
+                            break 'inner;
+                        }
+                    }
+                }
+
+                if match_count >= winning_count {
+                    has_won = true;
+                    break 'outer;
+                }
+            }
+        }
+
+        has_won
     }
 
     pub fn has_found_winner(&self) -> bool {
-        self.horizontal_check() || self.vertical_check() || self.diagonal_check()
+        self.horizontal_check()
+            || self.vertical_check()
+            || self.bottom_left_to_top_right_diagonal_check()
+            || self.top_left_to_bottom_right_diagonal_check()
     }
 
     pub fn print_game_over(self) {
