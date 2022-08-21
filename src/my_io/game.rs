@@ -2,7 +2,7 @@ use super::inputs;
 use colored::*;
 
 fn get_player_letters(player_num: u8) -> String {
-    let letters: [String; 7] = [
+    let letters: [String; inputs::PLAY_SIZE] = [
         format!("{}", "[x]".bright_cyan()),
         format!("{}", "[O]".bright_yellow()),
         format!("{}", "[Z]".bright_magenta()),
@@ -26,7 +26,8 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(play_size: usize) -> Self {
+    pub fn new() -> Self {
+        let play_size = inputs::PLAY_SIZE;
         let output = vec![vec![String::from("( )"); play_size]; play_size];
         Game {
             output,

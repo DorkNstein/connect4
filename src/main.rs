@@ -2,12 +2,9 @@ use colored::*;
 mod my_io;
 use my_io::game::Game;
 
-fn main() {
-    println!("{}", "\nHello, Welcome to Connect 4!".bright_cyan());
-    let player_count = my_io::inputs::get_player_count();
-
-    let mut game = Game::new(7);
+fn start_game(player_count: usize) {
     println!("{}", "Let's start!\n".bright_green());
+    let mut game = Game::new();
     game.print_output();
     'outer: loop {
         for each in 0..player_count {
@@ -19,5 +16,11 @@ fn main() {
             }
         }
     }
+}
+
+fn main() {
+    println!("{}", "\nHello, Welcome to Connect 4!".bright_cyan());
+    let player_count = my_io::inputs::get_player_count();
+    start_game(player_count);
     println!("{}", "GAME OVER!".bright_green());
 }
