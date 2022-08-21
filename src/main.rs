@@ -178,12 +178,6 @@ fn horizontal_check(output: &Vec<Vec<String>>, player_num: u8) -> bool {
     for row in output.iter() {
         let mut match_count = 0;
         row.iter().for_each(|each| {
-            // println!(
-            //     "{} = {}: {}",
-            //     each.to_owned(),
-            //     player_letter,
-            //     each.to_owned() == player_letter
-            // );
             if each.to_owned() == player_letter {
                 match_count += 1;
             } else if match_count < winning_count {
@@ -198,18 +192,34 @@ fn horizontal_check(output: &Vec<Vec<String>>, player_num: u8) -> bool {
     has_won
 }
 
-fn vertical_check(_output: &Vec<Vec<String>>, _player_num: u8) -> bool {
-    true
+fn vertical_check(output: &Vec<Vec<String>>, player_num: u8) -> bool {
+    let mut has_won = false;
+    let player_letter = get_player_letters(player_num);
+    let winning_count = (PLAY_SIZE + 1) / 2;
+    let mut each_column_count = vec![0 as usize; PLAY_SIZE];
+    for row in output.iter() {
+        row.iter().enumerate().for_each(|(index, each)| {
+            if each.to_owned() == player_letter {
+                each_column_count[index] += 1;
+            } else if each_column_count[index] < winning_count {
+                each_column_count[index] = 0;
+            }
+        });
+        if each_column_count.iter().any(|x| x >= &winning_count) {
+            has_won = true;
+            break;
+        }
+    }
+    has_won
 }
 
 fn diagonal_check(_output: &Vec<Vec<String>>, _player_num: u8) -> bool {
-    true
+    false
 }
 
 fn has_found_winner(output: &Vec<Vec<String>>, player_num: u8) -> bool {
     horizontal_check(output, player_num)
-        && vertical_check(output, player_num)
-        && diagonal_check(output, player_num)
+        || (vertical_check(output, player_num) || diagonal_check(output, player_num))
 }
 
 fn main() {
