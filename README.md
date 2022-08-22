@@ -1,6 +1,6 @@
-# Connect Four
+# Connect4
 
-This is an implementation of the classic game of Connect Four.
+This is an implementation of the classic game of Connect4.
 
 ## Installation
 
