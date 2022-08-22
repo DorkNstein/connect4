@@ -11,7 +11,6 @@ fn start_game(player_count: usize) {
             let player = each as u8 + 1;
             game.player_round(player);
             if game.has_found_winner() {
-                game.print_game_over();
                 break 'outer;
             }
         }

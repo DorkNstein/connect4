@@ -3,13 +3,60 @@ use colored::*;
 
 fn get_player_letters(player_num: u8) -> String {
     let letters: [String; inputs::PLAY_SIZE] = [
-        format!("{}", "[x]".bright_cyan()),
+        format!("{}", "[X]".bright_cyan()),
         format!("{}", "[O]".bright_yellow()),
         format!("{}", "[Z]".bright_magenta()),
         format!("{}", "[A]".green()),
         format!("{}", "[B]".blue()),
         format!("{}", "[C]".white()),
         format!("{}", "[D]".bright_blue()),
+    ];
+    let count = player_num as usize - 1;
+    match count {
+        0..=7 => letters[count].to_owned(),
+        _ => letters[0].to_owned(),
+    }
+}
+
+fn get_player_win_highlight(player_num: u8) -> String {
+    let letters: [String; inputs::PLAY_SIZE] = [
+        format!(
+            "{}{}{}",
+            "{".bright_white(),
+            "X".bright_cyan(),
+            "}".bright_white()
+        ),
+        format!(
+            "{}{}{}",
+            "{".bright_white(),
+            "O".bright_yellow(),
+            "}".bright_white(),
+        ),
+        format!(
+            "{}{}{}",
+            "{".bright_white(),
+            "Z".bright_magenta(),
+            "}".bright_white(),
+        ),
+        format!(
+            "{}{}{}",
+            "{".bright_white(),
+            "A".green(),
+            "}".bright_white(),
+        ),
+        format!("{}{}{}", "{".bright_white(), "B".blue(), "}".bright_white(),),
+        format!(
+            "{}{}{}",
+            "{".bright_white(),
+            "C".white(),
+            "}".bright_white(),
+        ),
+        format!(
+            "{}{}{}",
+            "{".bright_white(),
+            "D".bright_blue(),
+            "}".bright_white(),
+        ),
     ];
     let count = player_num as usize - 1;
     match count {
@@ -90,74 +137,85 @@ impl Game {
         input
     }
 
-    fn horizontal_check(&self) -> bool {
-        let mut has_won = false;
-        let player_letter = get_player_letters(self.player);
-        let winning_count = (self.play_size + 1) / 2;
-        for row in self.output.iter() {
-            let mut match_count = 0;
-            row.iter().for_each(|each| {
-                if each.to_owned() == player_letter {
-                    match_count += 1;
-                } else if match_count < winning_count {
-                    match_count = 0;
-                }
-            });
-            if match_count >= winning_count {
-                has_won = true;
-                break;
-            }
-        }
-        has_won
-    }
-
-    fn vertical_check(&self) -> bool {
-        let mut has_won = false;
-        let player_letter = get_player_letters(self.player);
-        let winning_count = (self.play_size + 1) / 2;
-        let mut each_column_count = vec![0 as usize; self.play_size];
-        for row in self.output.iter() {
-            row.iter().enumerate().for_each(|(index, each)| {
-                if each.to_owned() == player_letter {
-                    each_column_count[index] += 1;
-                } else if each_column_count[index] < winning_count {
-                    each_column_count[index] = 0;
-                }
-            });
-            if each_column_count.iter().any(|x| x >= &winning_count) {
-                has_won = true;
-                break;
-            }
-        }
-        has_won
-    }
-
-    fn bottom_left_to_top_right_diagonal_check(&self) -> bool {
+    fn horizontal_check(&mut self) -> bool {
         let mut has_won = false;
         let player_letter = get_player_letters(self.player);
         let winning_count = (self.play_size + 1) / 2;
         'outer: for (y_index, row) in self.output.iter().enumerate() {
-            if y_index < winning_count - 1 {
-                break 'outer;
-            }
-            for (x_index, cell) in row.iter().enumerate() {
-                let mut match_count = 0;
-                // Check next 4 diagonal cells up from bottom left to top right starting from current cell
+            let mut match_count = 0;
+            for (_x_index, cell) in row.iter().enumerate() {
                 if cell.to_owned() == player_letter {
                     match_count += 1;
+                    if match_count >= winning_count {
+                        for i in 0..winning_count {
+                            self.output[y_index][i] = get_player_win_highlight(self.player);
+                        }
+                        self.print_game_over();
+                        has_won = true;
+                        break 'outer;
+                    }
+                } else if match_count < winning_count {
+                    match_count = 0;
+                }
+            }
+        }
+        has_won
+    }
+
+    fn vertical_check(&mut self) -> bool {
+        let mut has_won = false;
+        let player_letter = get_player_letters(self.player);
+        let winning_count = (self.play_size + 1) / 2;
+        let mut each_column_count = vec![0 as usize; self.play_size];
+        'outer: for (y_index, row) in self.output.iter().enumerate() {
+            for (x_index, each) in row.iter().enumerate() {
+                if each.to_owned() == player_letter {
+                    each_column_count[x_index] += 1;
+                    if each_column_count[x_index] == winning_count {
+                        for i in 0..winning_count {
+                            self.output[y_index - i][x_index] =
+                                get_player_win_highlight(self.player);
+                        }
+                        self.print_game_over();
+                        has_won = true;
+                        break 'outer;
+                    }
+                } else if each_column_count[x_index] < winning_count {
+                    each_column_count[x_index] = 0;
+                }
+            }
+        }
+        has_won
+    }
+
+    fn bottom_left_to_top_right_diagonal_check(&mut self) -> bool {
+        let mut has_won = false;
+        let player_letter = get_player_letters(self.player);
+        let winning_count = (self.play_size + 1) / 2;
+        'outer: for (y_index, row) in self.output.iter().enumerate() {
+            for (x_index, cell) in row.iter().enumerate() {
+                if x_index > winning_count - 1 {
+                    continue;
+                }
+                // Check next 4 diagonal cells up from bottom left to top right starting from current cell
+                if cell.to_owned() == player_letter {
+                    let mut match_count = 1;
                     'inner: for each in 1..4 {
                         if self.output[y_index - each][x_index + each] == player_letter {
                             match_count += 1;
+                            if match_count >= winning_count {
+                                for i in 0..winning_count {
+                                    self.output[y_index - i][x_index + i] =
+                                        get_player_win_highlight(self.player);
+                                }
+                                self.print_game_over();
+                                has_won = true;
+                                break 'outer;
+                            }
                         } else {
-                            match_count = 0;
                             break 'inner;
                         }
                     }
-                }
-
-                if match_count >= winning_count {
-                    has_won = true;
-                    break 'outer;
                 }
             }
         }
@@ -165,7 +223,7 @@ impl Game {
         has_won
     }
 
-    fn top_left_to_bottom_right_diagonal_check(&self) -> bool {
+    fn top_left_to_bottom_right_diagonal_check(&mut self) -> bool {
         let mut has_won = false;
         let player_letter = get_player_letters(self.player);
         let winning_count = (self.play_size + 1) / 2;
@@ -175,38 +233,40 @@ impl Game {
                 continue 'outer;
             }
             for (x_index, cell) in row.iter().enumerate() {
-                let mut match_count = 0;
                 // Check next 4 diagonal cells down from top left to bottom right starting from current cell
                 if cell.to_owned() == player_letter {
-                    match_count += 1;
+                    let mut match_count = 1;
                     'inner: for each in 1..4 {
                         if self.output[y_index + each][x_index + each] == player_letter {
                             match_count += 1;
+                            if match_count >= winning_count {
+                                for i in 0..winning_count {
+                                    self.output[y_index + i][x_index + i] =
+                                        get_player_win_highlight(self.player);
+                                }
+                                self.print_game_over();
+                                has_won = true;
+                                break 'outer;
+                            }
                         } else {
-                            match_count = 0;
                             break 'inner;
                         }
                     }
                 }
-
-                if match_count >= winning_count {
-                    has_won = true;
-                    break 'outer;
-                }
             }
         }
-
         has_won
     }
 
-    pub fn has_found_winner(&self) -> bool {
+    pub fn has_found_winner(&mut self) -> bool {
         self.horizontal_check()
             || self.vertical_check()
             || self.bottom_left_to_top_right_diagonal_check()
             || self.top_left_to_bottom_right_diagonal_check()
     }
 
-    pub fn print_game_over(self) {
+    pub fn print_game_over(&self) {
+        self.print_output();
         println!(
             "{} {} {}",
             "Player".bright_yellow(),
