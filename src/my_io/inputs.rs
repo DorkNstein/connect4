@@ -6,7 +6,7 @@ pub const PLAY_SIZE: usize = 7;
 pub fn get_player_count() -> usize {
     println!(
         "{} {}:",
-        "Enter number of players between 1 and".bright_green(),
+        "How many players - pick 1 to".bright_green(),
         PLAY_SIZE.to_string().bright_green()
     );
     let err_msg = format!(
@@ -43,9 +43,10 @@ pub fn get_player_count() -> usize {
 
 pub fn get_player_names(player: &usize) -> String {
     println!(
-        "{} {}:",
-        "Pick a name for player".bright_green(),
-        player.to_string().bright_green()
+        "{} {} {}:",
+        "Player".bright_white(),
+        player.to_string().bright_white(),
+        "name".bright_white()
     );
     let mut input = String::new();
     io::stdin()

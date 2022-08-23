@@ -72,7 +72,7 @@ impl Game {
 
     pub fn print_round(&self) -> String {
         let player_string: String;
-        let input_msg = ", your turn";
+        let input_msg = "'s turn";
         player_string = match self.player {
             1 => format!(
                 "{}{}",
@@ -263,11 +263,23 @@ impl Game {
         has_won
     }
 
+    fn draw_check(&self) -> bool {
+        let is_draw = self
+            .each_column_position
+            .iter()
+            .all(|fill| fill.to_owned() > inputs::PLAY_SIZE - 1);
+        if is_draw {
+            println!("{}", "Its a DRAW!".bright_yellow());
+        }
+        is_draw
+    }
+
     pub fn has_found_winner(&mut self) -> bool {
         self.horizontal_check()
             || self.vertical_check()
             || self.bottom_left_to_top_right_diagonal_check()
             || self.top_left_to_bottom_right_diagonal_check()
+            || self.draw_check()
     }
 
     pub fn print_game_over(&self) {
