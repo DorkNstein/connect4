@@ -73,6 +73,7 @@ fn get_player_win_highlight(player_num: u8) -> String {
 pub struct Game {
     output: Vec<Vec<String>>,
     pub player: u8,
+    player_name: String,
     play_size: usize,
     each_column_position: Vec<usize>,
 }
@@ -84,6 +85,7 @@ impl Game {
         Game {
             output,
             player: 1,
+            player_name: String::from(""),
             play_size,
             each_column_position: vec![0 as usize; play_size],
         }
@@ -99,29 +101,29 @@ impl Game {
 
     pub fn print_round(&self) -> String {
         let player_string: String;
-        let input_msg = "st player, input a number between 1 to";
+        let input_msg = ", your turn";
         player_string = match self.player {
             1 => format!(
                 "{}{}",
-                self.player.to_string().bright_cyan(),
+                self.player_name.bright_cyan(),
                 input_msg.bright_cyan(),
             ),
             2 => format!(
                 "{}{}",
-                self.player.to_string().bright_yellow(),
+                self.player_name.bright_yellow(),
                 input_msg.bright_yellow(),
             ),
             3 => format!(
                 "{}{}",
-                self.player.to_string().bright_magenta(),
+                self.player_name.bright_magenta(),
                 input_msg.bright_magenta(),
             ),
-            4 => format!("{}{}", self.player.to_string().green(), input_msg.green(),),
-            5 => format!("{}{}", self.player.to_string().blue(), input_msg.blue(),),
-            6 => format!("{}{}", self.player.to_string().white(), input_msg.white(),),
+            4 => format!("{}{}", self.player_name.green(), input_msg.green(),),
+            5 => format!("{}{}", self.player_name.blue(), input_msg.blue(),),
+            6 => format!("{}{}", self.player_name.white(), input_msg.white(),),
             7 => format!(
                 "{}{}",
-                self.player.to_string().bright_blue(),
+                self.player_name.bright_blue(),
                 input_msg.bright_blue(),
             ),
             _ => String::from(""),
@@ -129,10 +131,11 @@ impl Game {
         player_string
     }
 
-    pub fn player_round(&mut self, player: u8) -> usize {
+    pub fn player_round(&mut self, player: u8, player_name: &String) -> usize {
         self.player = player;
+        self.player_name = player_name.clone();
         let player_string = Game::print_round(&self);
-        println!("{} {}", player_string, self.play_size);
+        println!("{}", player_string);
         let input = inputs::user_input(&self.each_column_position);
         let position = input - 1;
         let input_str = format!("{}", get_player_letters(self.player));
@@ -279,9 +282,8 @@ impl Game {
     pub fn print_game_over(&self) {
         self.print_output();
         println!(
-            "{} {} {}",
-            "Player".bright_yellow(),
-            self.player.to_string().bright_yellow(),
+            "{} {}",
+            self.player_name.to_string().bright_yellow(),
             "has WON!".bright_yellow()
         );
     }

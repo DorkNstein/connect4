@@ -41,6 +41,20 @@ pub fn get_player_count() -> usize {
     player_count
 }
 
+pub fn get_player_names(player: &usize) -> String {
+    println!(
+        "{} {}:",
+        "Pick a name for player".bright_green(),
+        player.to_string().bright_green()
+    );
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Should be a string value");
+    let name = input.trim().to_owned();
+    name
+}
+
 pub fn user_input(each_column_position: &Vec<usize>) -> usize {
     let err_msg = format!(
         "{} {}",
