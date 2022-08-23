@@ -233,6 +233,9 @@ impl Game {
                 continue 'outer;
             }
             for (x_index, cell) in row.iter().enumerate() {
+                if x_index > winning_count - 1 {
+                    continue;
+                }
                 // Check next 4 diagonal cells down from top left to bottom right starting from current cell
                 if cell.to_owned() == player_letter {
                     let mut match_count = 1;
