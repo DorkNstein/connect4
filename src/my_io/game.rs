@@ -22,40 +22,45 @@ fn get_player_win_highlight(player_num: u8) -> String {
     let letters: [String; inputs::PLAY_SIZE] = [
         format!(
             "{}{}{}",
-            "{".bright_white(),
-            "X".bright_cyan(),
-            "}".bright_white()
+            "{".bright_red(),
+            "X".bright_red(),
+            "}".bright_red()
         ),
         format!(
             "{}{}{}",
-            "{".bright_white(),
-            "O".bright_yellow(),
-            "}".bright_white(),
+            "{".bright_red(),
+            "O".bright_red(),
+            "}".bright_red(),
         ),
         format!(
             "{}{}{}",
-            "{".bright_white(),
-            "Z".bright_magenta(),
-            "}".bright_white(),
+            "{".bright_red(),
+            "Z".bright_red(),
+            "}".bright_red(),
         ),
         format!(
             "{}{}{}",
-            "{".bright_white(),
-            "A".green(),
-            "}".bright_white(),
-        ),
-        format!("{}{}{}", "{".bright_white(), "B".blue(), "}".bright_white(),),
-        format!(
-            "{}{}{}",
-            "{".bright_white(),
-            "C".white(),
-            "}".bright_white(),
+            "{".bright_red(),
+            "A".bright_red(),
+            "}".bright_red(),
         ),
         format!(
             "{}{}{}",
-            "{".bright_white(),
-            "D".bright_blue(),
-            "}".bright_white(),
+            "{".bright_red(),
+            "B".bright_red(),
+            "}".bright_red(),
+        ),
+        format!(
+            "{}{}{}",
+            "{".bright_red(),
+            "C".bright_red(),
+            "}".bright_red(),
+        ),
+        format!(
+            "{}{}{}",
+            "{".bright_red(),
+            "D".bright_red(),
+            "}".bright_red(),
         ),
     ];
     let count = player_num as usize - 1;
@@ -193,6 +198,9 @@ impl Game {
         let player_letter = get_player_letters(self.player);
         let winning_count = (self.play_size + 1) / 2;
         'outer: for (y_index, row) in self.output.iter().enumerate() {
+            if y_index < winning_count - 1 {
+                continue 'outer;
+            }
             for (x_index, cell) in row.iter().enumerate() {
                 if x_index > winning_count - 1 {
                     continue;
