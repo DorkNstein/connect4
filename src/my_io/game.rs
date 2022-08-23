@@ -10,62 +10,33 @@ fn get_player_letters(player_num: u8) -> String {
         format!("{}", "[B]".blue()),
         format!("{}", "[C]".white()),
         format!("{}", "[D]".bright_blue()),
+        // format!("{}", "[E]".green()),
+        // format!("{}", "[F]".blue()),
+        // format!("{}", "[G]".white()),
+        // format!("{}", "[H]".bright_blue()),
     ];
     let count = player_num as usize - 1;
     match count {
-        0..=7 => letters[count].to_owned(),
+        0..=inputs::PLAY_SIZE => letters[count].to_owned(),
         _ => letters[0].to_owned(),
     }
 }
 
 fn get_player_win_highlight(player_num: u8) -> String {
-    let letters: [String; inputs::PLAY_SIZE] = [
-        format!(
-            "{}{}{}",
-            "{".bright_red(),
-            "X".bright_red(),
-            "}".bright_red()
-        ),
-        format!(
-            "{}{}{}",
-            "{".bright_red(),
-            "O".bright_red(),
-            "}".bright_red(),
-        ),
-        format!(
-            "{}{}{}",
-            "{".bright_red(),
-            "Z".bright_red(),
-            "}".bright_red(),
-        ),
-        format!(
-            "{}{}{}",
-            "{".bright_red(),
-            "A".bright_red(),
-            "}".bright_red(),
-        ),
-        format!(
-            "{}{}{}",
-            "{".bright_red(),
-            "B".bright_red(),
-            "}".bright_red(),
-        ),
-        format!(
-            "{}{}{}",
-            "{".bright_red(),
-            "C".bright_red(),
-            "}".bright_red(),
-        ),
-        format!(
-            "{}{}{}",
-            "{".bright_red(),
-            "D".bright_red(),
-            "}".bright_red(),
-        ),
+    let chars = [
+        "X", "O", "Z", "A", "B", "C", "D", /* "E", "F", "G", "H" */
     ];
+    let letters: [String; inputs::PLAY_SIZE] = chars.map(|letter| {
+        format!(
+            "{}{}{}",
+            "{".bright_red(),
+            letter.bright_red(),
+            "}".bright_red()
+        )
+    });
     let count = player_num as usize - 1;
     match count {
-        0..=7 => letters[count].to_owned(),
+        0..=inputs::PLAY_SIZE => letters[count].to_owned(),
         _ => letters[0].to_owned(),
     }
 }
@@ -126,6 +97,26 @@ impl Game {
                 self.player_name.bright_blue(),
                 input_msg.bright_blue(),
             ),
+            // 8 => format!(
+            //     "{}{}",
+            //     self.player_name.bright_blue(),
+            //     input_msg.bright_blue(),
+            // ),
+            // 9 => format!(
+            //     "{}{}",
+            //     self.player_name.bright_blue(),
+            //     input_msg.bright_blue(),
+            // ),
+            // 10 => format!(
+            //     "{}{}",
+            //     self.player_name.bright_blue(),
+            //     input_msg.bright_blue(),
+            // ),
+            // 11 => format!(
+            //     "{}{}",
+            //     self.player_name.bright_blue(),
+            //     input_msg.bright_blue(),
+            // ),
             _ => String::from(""),
         };
         player_string
@@ -211,7 +202,7 @@ impl Game {
                 // Check next 4 diagonal cells up from bottom left to top right starting from current cell
                 if cell.to_owned() == player_letter {
                     let mut match_count = 1;
-                    'inner: for each in 1..4 {
+                    'inner: for each in 1..winning_count {
                         if self.output[y_index - each][x_index + each] == player_letter {
                             match_count += 1;
                             if match_count >= winning_count {
@@ -250,7 +241,7 @@ impl Game {
                 // Check next 4 diagonal cells down from top left to bottom right starting from current cell
                 if cell.to_owned() == player_letter {
                     let mut match_count = 1;
-                    'inner: for each in 1..4 {
+                    'inner: for each in 1..winning_count {
                         if self.output[y_index + each][x_index + each] == player_letter {
                             match_count += 1;
                             if match_count >= winning_count {
