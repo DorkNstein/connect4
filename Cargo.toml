@@ -10,3 +10,4 @@ keywords = ["connect4", "game"]
 
 [dependencies]
 colored = "2"
+yew = "0.19.3"
