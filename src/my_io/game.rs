@@ -58,7 +58,7 @@ impl Game {
             player: 1,
             player_name: String::from(""),
             play_size,
-            each_column_position: vec![0 as usize; play_size],
+            each_column_position: vec![0_usize; play_size],
         }
     }
 
@@ -67,13 +67,12 @@ impl Game {
             let merged: String = it.iter().map(|x| x.to_owned()).collect::<String>();
             println!("{}", merged);
         });
-        println!("{}", "\n");
+        println!("\n");
     }
 
     pub fn print_round(&self) -> String {
-        let player_string: String;
         let input_msg = "'s turn";
-        player_string = match self.player {
+        match self.player {
             1 => format!(
                 "{}{}",
                 self.player_name.bright_cyan(),
@@ -118,18 +117,17 @@ impl Game {
             //     input_msg.bright_blue(),
             // ),
             _ => String::from(""),
-        };
-        player_string
+        }
     }
 
-    pub fn player_round(&mut self, player: u8, player_name: &String) -> usize {
+    pub fn player_round(&mut self, player: u8, player_name: &str) -> usize {
         self.player = player;
-        self.player_name = player_name.clone();
-        let player_string = Game::print_round(&self);
+        self.player_name = player_name.to_owned();
+        let player_string = Game::print_round(self);
         println!("{}", player_string);
         let input = inputs::user_input(&self.each_column_position);
         let position = input - 1;
-        let input_str = format!("{}", get_player_letters(self.player));
+        let input_str = get_player_letters(self.player);
         self.each_column_position[position] += 1;
         self.output[self.play_size - self.each_column_position[position]][position] = input_str;
         self.print_output();
@@ -143,7 +141,7 @@ impl Game {
         'outer: for (y_index, row) in self.output.iter().enumerate() {
             let mut match_count = 0;
             for (_x_index, cell) in row.iter().enumerate() {
-                if cell.to_owned() == player_letter {
+                if *cell == player_letter {
                     match_count += 1;
                     if match_count >= winning_count {
                         for i in 0..winning_count {
@@ -165,10 +163,10 @@ impl Game {
         let mut has_won = false;
         let player_letter = get_player_letters(self.player);
         let winning_count = (self.play_size + 1) / 2;
-        let mut each_column_count = vec![0 as usize; self.play_size];
+        let mut each_column_count = vec![0_usize; self.play_size];
         'outer: for (y_index, row) in self.output.iter().enumerate() {
             for (x_index, each) in row.iter().enumerate() {
-                if each.to_owned() == player_letter {
+                if *each == player_letter {
                     each_column_count[x_index] += 1;
                     if each_column_count[x_index] == winning_count {
                         for i in 0..winning_count {
@@ -200,7 +198,7 @@ impl Game {
                     continue;
                 }
                 // Check next 4 diagonal cells up from bottom left to top right starting from current cell
-                if cell.to_owned() == player_letter {
+                if *cell == player_letter {
                     let mut match_count = 1;
                     'inner: for each in 1..winning_count {
                         if self.output[y_index - each][x_index + each] == player_letter {
@@ -239,7 +237,7 @@ impl Game {
                     continue;
                 }
                 // Check next 4 diagonal cells down from top left to bottom right starting from current cell
-                if cell.to_owned() == player_letter {
+                if *cell == player_letter {
                     let mut match_count = 1;
                     'inner: for each in 1..winning_count {
                         if self.output[y_index + each][x_index + each] == player_letter {
@@ -267,7 +265,7 @@ impl Game {
         let is_draw = self
             .each_column_position
             .iter()
-            .all(|fill| fill.to_owned() > inputs::PLAY_SIZE - 1);
+            .all(|fill| *fill > inputs::PLAY_SIZE - 1);
         if is_draw {
             println!("{}", "Its a DRAW!".bright_yellow());
         }
