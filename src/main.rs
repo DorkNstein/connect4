@@ -68,8 +68,8 @@ fn start_game(player_count: usize) {
 
 fn main() {
     yew::start_app::<Model>();
-    println!("{}", "\nHello, Welcome to Connect 4!".bright_cyan());
-    let player_count = my_io::inputs::get_player_count();
-    start_game(player_count);
-    println!("{}", "GAME OVER!".bright_green());
+    // println!("{}", "\nHello, Welcome to Connect 4!".bright_cyan());
+    // let player_count = my_io::inputs::get_player_count();
+    // start_game(player_count);
+    // println!("{}", "GAME OVER!".bright_green());
 }
