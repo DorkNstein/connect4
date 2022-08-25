@@ -1,12 +1,8 @@
 #![deny(clippy::all)]
-#![warn(clippy::pedantic)]
-#![warn(clippy::restriction)]
-#![warn(clippy::nursery)]
-#![warn(clippy::cargo)]
 
 use std::collections::HashMap;
 
-use colored::*;
+use colored::Colorize;
 mod my_io;
 use my_io::game::Game;
 
@@ -21,7 +17,7 @@ fn start_game(player_count: usize) {
     'outer: loop {
         for each in 1..=player_count {
             let player = each as u8;
-            game.player_round(player, player_names.get(&each).unwrap());
+            game.player_round(player, &player_names[&each]);
             if game.has_found_winner() {
                 break 'outer;
             }

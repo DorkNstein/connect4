@@ -1,5 +1,5 @@
 use super::inputs;
-use colored::*;
+use colored::Colorize;
 
 fn get_player_letters(player_num: u8) -> String {
     let letters: [String; inputs::PLAY_SIZE] = [
@@ -17,8 +17,8 @@ fn get_player_letters(player_num: u8) -> String {
     ];
     let count = player_num as usize - 1;
     match count {
-        0..=inputs::PLAY_SIZE => letters[count].to_owned(),
-        _ => letters[0].to_owned(),
+        0..=inputs::PLAY_SIZE => return letters.get(count).unwrap().to_owned(),
+        _ => letters[0].clone(),
     }
 }
 
@@ -36,8 +36,8 @@ fn get_player_win_highlight(player_num: u8) -> String {
     });
     let count = player_num as usize - 1;
     match count {
-        0..=inputs::PLAY_SIZE => letters[count].to_owned(),
-        _ => letters[0].to_owned(),
+        0..=inputs::PLAY_SIZE => letters[count].clone(),
+        _ => letters[0].clone(),
     }
 }
 
@@ -53,7 +53,7 @@ impl Game {
     pub fn new() -> Self {
         let play_size = inputs::PLAY_SIZE;
         let output = vec![vec![String::from("( )"); play_size]; play_size];
-        Game {
+        Self {
             output,
             player: 1,
             player_name: String::from(""),
@@ -64,7 +64,7 @@ impl Game {
 
     pub fn print_output(&self) {
         self.output.iter().for_each(|it| {
-            let merged: String = it.iter().map(|x| x.to_owned()).collect::<String>();
+            let merged: String = it.iter().cloned().collect::<String>();
             println!("{}", merged);
         });
         println!("\n");
@@ -123,7 +123,7 @@ impl Game {
     pub fn player_round(&mut self, player: u8, player_name: &str) -> usize {
         self.player = player;
         self.player_name = player_name.to_owned();
-        let player_string = Game::print_round(self);
+        let player_string = Self::print_round(self);
         println!("{}", player_string);
         let input = inputs::user_input(&self.each_column_position);
         let position = input - 1;

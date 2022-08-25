@@ -1,4 +1,4 @@
-use colored::*;
+use colored::Colorize;
 use std::io;
 
 pub const PLAY_SIZE: usize = 7;
@@ -56,7 +56,7 @@ pub fn get_player_names(player: &usize) -> String {
     name
 }
 
-pub fn user_input(each_column_position: &Vec<usize>) -> usize {
+pub fn user_input(each_column_position: &[usize]) -> usize {
     let err_msg = format!(
         "{} {}",
         "Invalid input. Please enter a number between 1 and".bright_red(),
@@ -75,14 +75,13 @@ pub fn user_input(each_column_position: &Vec<usize>) -> usize {
                     if each_column_position[n - 1] < PLAY_SIZE {
                         player_input = n;
                         break;
-                    } else {
-                        println!(
-                            "{} {}",
-                            "Cannot place anymore in column".bright_red(),
-                            n.to_string().bright_red()
-                        );
-                        continue;
                     }
+                    println!(
+                        "{} {}",
+                        "Cannot place anymore in column".bright_red(),
+                        n.to_string().bright_red()
+                    );
+                    continue;
                 }
                 _ => {
                     println!("{}", err_msg);
